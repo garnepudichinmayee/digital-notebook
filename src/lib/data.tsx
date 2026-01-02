@@ -1,5 +1,17 @@
-import React from "react";
-import { Folder as FolderIcon, FileText, BookOpen } from "lucide-react";
+import React from 'react';
+import {
+  Folder as FolderIcon,
+  FileText,
+  BookOpen,
+  FlaskConical,
+  Atom,
+  Feather,
+  Sigma,
+  Scale,
+  Languages,
+  PenSquare,
+  Landmark,
+} from 'lucide-react';
 
 export type Folder = {
   id: string;
@@ -26,10 +38,14 @@ export type Document = {
 };
 
 export const folders: Folder[] = [
-  { id: '1', name: 'Molecular Biology', icon: <FolderIcon className="h-4 w-4" /> },
-  { id: '2', name: 'Organic Chemistry', icon: <FolderIcon className="h-4 w-4" /> },
-  { id: '3', name: 'European History', icon: <FolderIcon className="h-4 w-4" /> },
-  { id: '4', name: 'Calculus II', icon: <FolderIcon className="h-4 w-4" /> },
+  { id: '1', name: 'Molecular Biology', icon: <Atom className="h-4 w-4" /> },
+  { id: '2', name: 'Organic Chemistry', icon: <FlaskConical className="h-4 w-4" /> },
+  { id: '3', name: 'European History', icon: <Landmark className="h-4 w-4" /> },
+  { id: '4', name: 'Calculus II', icon: <Sigma className="h-4 w-4" /> },
+  { id: '5', name: 'Creative Writing', icon: <PenSquare className="h-4 w-4" /> },
+  { id: '6', name: 'Physics', icon: <Atom className="h-4 w-4" /> },
+  { id: '7', name: 'Law', icon: <Scale className="h-4 w-4" /> },
+  { id: '8', name: 'Languages', icon: <Languages className="h-4 w-4" /> },
 ];
 
 export const notes: Note[] = [
