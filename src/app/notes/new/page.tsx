@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { folders, notes } from '@/lib/data';
+import { folders, notes, noteContentStore } from '@/lib/data';
 import Link from 'next/link';
 import { ChevronLeft, Plus, Trash2 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
@@ -46,9 +46,10 @@ export default function NewNotePage() {
     }
 
     setIsSaving(true);
-
+    
+    const newNoteId = `n${notes.length + 1}`;
     const newNote = {
-      id: `n${notes.length + 1}`,
+      id: newNoteId,
       title,
       type: 'Note' as const,
       subject,
@@ -57,8 +58,8 @@ export default function NewNotePage() {
       manualHighlights: manualHighlights,
     };
     
-    console.log('New note created:', newNote);
     notes.push(newNote);
+    noteContentStore[newNoteId] = content;
 
     setTimeout(() => {
       setIsSaving(false);
