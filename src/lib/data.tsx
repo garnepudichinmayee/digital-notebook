@@ -127,3 +127,8 @@ export const getIconForType = (type: 'Note' | 'Document') => {
             return null;
     }
 }
+
+// A mock in-memory store for full document content.
+export const documentContentStore: { [key: string]: string } = {};
+// A mock in-memory store for full note content.
+export const noteContentStore: { [key: string]: string } = {};

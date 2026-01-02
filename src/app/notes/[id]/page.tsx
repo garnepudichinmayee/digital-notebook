@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useTransition, use } from 'react';
-import { notes, type Note } from '@/lib/data';
+import { notes, noteContentStore, type Note } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,11 +20,6 @@ import { Sparkles, Loader2, AlertCircle, Plus, Trash2 } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
-
-// A mock in-memory store for full note content.
-// This needs to be outside the component to persist across re-renders.
-const noteContentStore: { [key: string]: string } = {};
-
 
 export default function NotePage({ params }: { params: { id: string } }) {
   const id = use(params).id;
