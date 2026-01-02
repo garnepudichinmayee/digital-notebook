@@ -1,3 +1,7 @@
+
+'use client';
+
+import Link from 'next/link';
 import type { Note, Document } from '@/lib/data.tsx';
 import {
   Card,
@@ -16,14 +20,21 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { getIconForType } from '@/lib/data.tsx';
+import { useRouter } from 'next/navigation';
 
 type AllFilesViewProps = {
   items: (Note | Document)[];
 };
 
 export function AllFilesView({ items }: AllFilesViewProps) {
+  const router = useRouter();
     // Sort items by last modified date
     const sortedItems = [...items].sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime());
+
+  const handleRowClick = (item: Note | Document) => {
+    const path = item.type === 'Note' ? '/notes/' : '/documents/';
+    router.push(`${path}${item.id}`);
+  };
 
   return (
     <Card>
@@ -45,7 +56,7 @@ export function AllFilesView({ items }: AllFilesViewProps) {
           </TableHeader>
           <TableBody>
             {sortedItems.map((item) => (
-              <TableRow key={item.id}>
+              <TableRow key={item.id} onClick={() => handleRowClick(item)} className="cursor-pointer">
                 <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
                         {getIconForType(item.type)}
