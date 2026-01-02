@@ -44,9 +44,11 @@ export function SidebarNav({ folders }: SidebarNavProps) {
     <SidebarContent>
         <SidebarMenu>
             <SidebarMenuItem>
-                <SidebarMenuButton href="#" isActive>
-                    <Home />
-                    <span>Dashboard</span>
+                <SidebarMenuButton asChild isActive>
+                    <Link href="/">
+                        <Home />
+                        <span>Dashboard</span>
+                    </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
              <SidebarMenuItem>
