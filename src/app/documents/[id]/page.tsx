@@ -19,11 +19,10 @@ import {
 import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
-// A mock in-memory store. In a real app, you'd use a database.
-const documentStore: { [key: string]: Document } = {};
+// A mock in-memory store for full document content.
+const documentContentStore: { [key: string]: string } = {};
 documents.forEach(doc => {
-    const fullContent = `${doc.excerpt}\n\nThis is a placeholder for the full document content. You can expand on the excerpt here with the complete text of "${doc.title}".`;
-    documentStore[doc.id] = { ...doc, excerpt: fullContent };
+    documentContentStore[doc.id] = `${doc.excerpt}\n\nThis is a placeholder for the full document content. You can expand on the excerpt here with the complete text of "${doc.title}".`;
 });
 
 
@@ -40,11 +39,12 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    const docToLoad = documentStore[id];
+    const docToLoad = documents.find(d => d.id === id);
 
     if (docToLoad) {
       setDoc(docToLoad);
-      setContent(docToLoad.excerpt);
+      // Load full content from our store
+      setContent(documentContentStore[id]);
     } else {
         notFound();
     }
@@ -55,12 +55,19 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
     if (!doc) return;
     setIsSaving(true);
     
-    // Update our mock store
-    documentStore[doc.id] = { ...doc, excerpt: content, lastModified: new Date().toISOString().split('T')[0] };
+    // Update our mock content store
+    documentContentStore[doc.id] = content;
+
+    // Also update the excerpt in the main data array for display on other pages
+    const docIndex = documents.findIndex(d => d.id === doc.id);
+    if (docIndex !== -1) {
+        documents[docIndex].excerpt = content.substring(0, 100) + (content.length > 100 ? '...' : '');
+        documents[docIndex].lastModified = new Date().toISOString().split('T')[0];
+    }
 
     setTimeout(() => {
         setIsSaving(false);
-        setDoc(documentStore[doc.id]); // Refresh state
+        // We don't need to call setDoc here as the document properties aren't changing, only content
         toast({
             title: "Document Saved!",
             description: "Your changes have been saved successfully.",

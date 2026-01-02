@@ -19,11 +19,10 @@ import {
 import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
-// A mock in-memory store. In a real app, you'd use a database.
-const noteStore: { [key: string]: Note } = {};
+// A mock in-memory store for full note content.
+const noteContentStore: { [key: string]: string } = {};
 notes.forEach(note => {
-    const fullContent = `${note.excerpt}\n\nThis is a placeholder for the full note content. You can expand on the excerpt here with more details, examples, and explanations related to "${note.title}".`;
-    noteStore[note.id] = { ...note, excerpt: fullContent };
+    noteContentStore[note.id] = `${note.excerpt}\n\nThis is a placeholder for the full note content. You can expand on the excerpt here with more details, examples, and explanations related to "${note.title}".`;
 });
 
 
@@ -40,11 +39,12 @@ export default function NotePage({ params }: { params: { id: string } }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    const noteToLoad = noteStore[id];
+    const noteToLoad = notes.find(n => n.id === id);
 
     if (noteToLoad) {
       setNote(noteToLoad);
-      setContent(noteToLoad.excerpt); 
+      // Load full content from our store
+      setContent(noteContentStore[id]); 
     } else {
         notFound();
     }
@@ -55,12 +55,19 @@ export default function NotePage({ params }: { params: { id: string } }) {
     if (!note) return;
     setIsSaving(true);
     
-    // Update our mock store
-    noteStore[note.id] = { ...note, excerpt: content, lastModified: new Date().toISOString().split('T')[0] };
+    // Update our mock content store
+    noteContentStore[note.id] = content;
+    
+    // Also update the excerpt in the main data array for display on other pages
+    const noteIndex = notes.findIndex(n => n.id === note.id);
+    if (noteIndex !== -1) {
+        notes[noteIndex].excerpt = content.substring(0, 100) + (content.length > 100 ? '...' : '');
+        notes[noteIndex].lastModified = new Date().toISOString().split('T')[0];
+    }
 
     setTimeout(() => {
         setIsSaving(false);
-        setNote(noteStore[note.id]); // Refresh component state
+        // We don't need to call setNote here as the note properties aren't changing, only content
         toast({
             title: "Note Saved!",
             description: "Your changes have been saved successfully.",
@@ -150,7 +157,7 @@ export default function NotePage({ params }: { params: { id: string } }) {
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Highlighting Failed</AlertTitle>
                 <AlertDescription>{highlightError}</AlertDescription>
-              </Alert>
+              </Aler>
             ) : highlights.length > 0 ? (
               <ul className="space-y-2 list-disc list-inside">
                 {highlights.map((point, index) => (
