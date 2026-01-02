@@ -23,11 +23,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 
 // A mock in-memory store for full document content.
+// This needs to be outside the component to persist across re-renders.
 const documentContentStore: { [key: string]: string } = {};
 
 
 export default function DocumentPage({ params }: { params: { id: string } }) {
-  const { id } = use(params);
+  const id = use(params).id;
   const [doc, setDoc] = useState<Document | undefined>(undefined);
   const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
