@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link, { type LinkProps } from 'next/link';
 import { ArrowUpRight, BookOpen, FileText } from 'lucide-react';
 import type { Note, Document } from '@/lib/data';
 import {
