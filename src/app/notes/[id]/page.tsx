@@ -41,9 +41,10 @@ export default function NotePage({ params }: { params: { id: string } }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    let noteToLoad = noteStore[params.id];
+    const noteId = params.id;
+    let noteToLoad = noteStore[noteId];
     if (!noteToLoad) {
-        const initialNote = notes.find((n) => n.id === params.id);
+        const initialNote = notes.find((n) => n.id === noteId);
         if(initialNote) {
             const fullContent = `${initialNote.excerpt}\n\nThis is a placeholder for the full note content. You can expand on the excerpt here with more details, examples, and explanations related to "${initialNote.title}".`;
             noteStore[initialNote.id] = {...initialNote, excerpt: fullContent};

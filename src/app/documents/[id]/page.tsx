@@ -41,22 +41,23 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    let docToLoad = documentStore[params.id];
-    
+    const docId = params.id;
+    let docToLoad = documentStore[docId];
+
     if (!docToLoad) {
-        const initialDoc = documents.find((d) => d.id === params.id);
-        if (initialDoc) {
-            const fullContent = `${initialDoc.excerpt}\n\nThis is a placeholder for the full document content. You can expand on the excerpt here with the complete text of "${initialDoc.title}".`;
-            documentStore[initialDoc.id] = { ...initialDoc, excerpt: fullContent };
-            docToLoad = documentStore[initialDoc.id];
-        }
+      const initialDoc = documents.find((d) => d.id === docId);
+      if (initialDoc) {
+        const fullContent = `${initialDoc.excerpt}\n\nThis is a placeholder for the full document content. You can expand on the excerpt here with the complete text of "${initialDoc.title}".`;
+        documentStore[initialDoc.id] = { ...initialDoc, excerpt: fullContent };
+        docToLoad = documentStore[initialDoc.id];
+      }
     }
 
     if (docToLoad) {
       setDoc(docToLoad);
-      setContent(docToLoad.excerpt); 
+      setContent(docToLoad.excerpt);
     } else {
-        notFound();
+      notFound();
     }
     setIsLoading(false);
   }, [params.id]);
