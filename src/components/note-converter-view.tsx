@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import Image from 'next/image';
 import { Wand2, Loader2, AlertCircle } from 'lucide-react';
 import {
@@ -12,7 +12,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { generateTextFromNote } from '@/app/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Textarea } from '@/components/ui/textarea';
@@ -21,21 +20,28 @@ export function NoteConverterView() {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<{ text: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isOnline, setIsOnline] = useState(true);
 
-  const noteImage = PlaceHolderImages.find((img) => img.id === 'handwritten-note');
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsOnline(navigator.onLine);
+      const handleOnline = () => setIsOnline(true);
+      const handleOffline = () => setIsOnline(false);
+      window.addEventListener('online', handleOnline);
+      window.addEventListener('offline', handleOffline);
+      return () => {
+        window.removeEventListener('online', handleOnline);
+        window.removeEventListener('offline', handleOffline);
+      };
+    }
+  }, []);
 
   const handleConversion = () => {
-    if (!noteImage?.imageUrl) return;
     setError(null);
     setResult(null);
 
     startTransition(async () => {
-      // The AI action will fail offline, so we'll just show an error.
-      if (typeof window !== 'undefined' && !navigator.onLine) {
-        setError("This feature requires an internet connection.");
-        return;
-      }
-      const response = await generateTextFromNote(noteImage.imageUrl);
+      const response = await generateTextFromNote(''); // Image is mocked in action
       if (response.success && response.data) {
         setResult(response.data);
       } else {
@@ -49,60 +55,51 @@ export function NoteConverterView() {
       <CardHeader>
         <CardTitle>Handwriting to Text Converter</CardTitle>
         <CardDescription>
-          Use our AI-powered tool to transform your handwritten notes into digital text. This feature requires an internet connection.
+          Use our AI-powered tool to transform your handwritten notes into digital text.
+          {!isOnline && <span className="text-destructive font-semibold"> This feature requires an internet connection.</span>}
         </CardDescription>
       </CardHeader>
       <CardContent className="grid md:grid-cols-2 gap-6">
         <div className="flex flex-col gap-4">
           <h3 className="font-semibold">Your Handwritten Note</h3>
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-lg border">
-            {noteImage?.imageUrl ? (
-              <Image
-                src={noteImage.imageUrl}
-                alt={noteImage.description}
-                fill
-                className="object-cover"
-                data-ai-hint={noteImage.imageHint}
-              />
-            ) : (
-                <div className="flex items-center justify-center h-full bg-muted">
-                    <p>No image available</p>
-                </div>
-            )}
+            <div className="flex items-center justify-center h-full bg-muted">
+              <p>No image available</p>
+            </div>
           </div>
         </div>
         <div className="flex flex-col gap-4">
-            <h3 className="font-semibold">Converted Text</h3>
-             <div className="relative flex-grow">
-                {isPending ? (
-                <div className="flex flex-col items-center justify-center h-full gap-2 rounded-lg border border-dashed">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                    <p className="text-muted-foreground">Converting your note...</p>
-                </div>
-                ) : error ? (
-                <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Conversion Failed</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                </Alert>
-                ) : result ? (
-                    <Textarea
-                        readOnly
-                        value={result.text}
-                        className="h-full resize-none font-headline text-base"
-                        aria-label="Converted Text"
-                    />
-                ) : (
-                <div className="flex flex-col items-center justify-center h-full gap-2 text-center rounded-lg border border-dashed">
-                    <Wand2 className="h-8 w-8 text-muted-foreground" />
-                    <p className="text-muted-foreground">The converted text will appear here.</p>
-                </div>
-                )}
-             </div>
+          <h3 className="font-semibold">Converted Text</h3>
+          <div className="relative flex-grow">
+            {isPending ? (
+              <div className="flex flex-col items-center justify-center h-full gap-2 rounded-lg border border-dashed">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                <p className="text-muted-foreground">Converting your note...</p>
+              </div>
+            ) : error ? (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Conversion Failed</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            ) : result ? (
+              <Textarea
+                readOnly
+                value={result.text}
+                className="h-full resize-none font-headline text-base"
+                aria-label="Converted Text"
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full gap-2 text-center rounded-lg border border-dashed">
+                <Wand2 className="h-8 w-8 text-muted-foreground" />
+                <p className="text-muted-foreground">The converted text will appear here.</p>
+              </div>
+            )}
+          </div>
         </div>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleConversion} disabled={isPending || !noteImage?.imageUrl}>
+        <Button onClick={handleConversion} disabled={isPending || !isOnline}>
           {isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
