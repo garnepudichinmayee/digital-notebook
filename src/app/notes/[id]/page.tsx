@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useTransition, use, useMemo } from 'react';
+import { useState, useEffect, use, useMemo } from 'react';
 import { notes, noteContentStore, type Note } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
@@ -8,7 +8,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
-import { generateHighlights } from '@/app/actions';
 import {
   Dialog,
   DialogContent,
@@ -16,9 +15,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Sparkles, Loader2, AlertCircle, Plus, Trash2, Edit, Save } from 'lucide-react';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Plus, Trash2, Edit, Save } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 
@@ -26,7 +23,9 @@ const renderWithHighlights = (text: string, highlights: string[]) => {
     if (!highlights.length) {
         return <p>{text}</p>;
     }
-    const regex = new RegExp(`(${highlights.join('|')})`, 'g');
+    // Escape special characters for regex
+    const escapedHighlights = highlights.map(h => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const regex = new RegExp(`(${escapedHighlights.join('|')})`, 'g');
     const parts = text.split(regex);
     return (
         <p>
@@ -46,11 +45,8 @@ export default function NotePage({ params }: { params: { id: string } }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
 
-  const [isHighlighting, startHighlightTransition] = useTransition();
-  const [aiHighlights, setAiHighlights] = useState<string[]>([]);
   const [manualHighlights, setManualHighlights] = useState<string[]>([]);
   const [newHighlight, setNewHighlight] = useState('');
-  const [highlightError, setHighlightError] = useState<string | null>(null);
   const [isHighlightDialogOpen, setIsHighlightDialogOpen] = useState(false);
   
   const { toast } = useToast();
@@ -95,20 +91,6 @@ export default function NotePage({ params }: { params: { id: string } }) {
     }, 500);
   };
   
-  const handleAiHighlight = () => {
-    setAiHighlights([]);
-    setHighlightError(null);
-    setIsHighlightDialogOpen(true);
-    startHighlightTransition(async () => {
-      const result = await generateHighlights(content);
-      if (result.success && result.data) {
-        setAiHighlights(result.data.points);
-      } else {
-        setHighlightError(result.error || 'An unexpected error occurred.');
-      }
-    });
-  };
-
   const handleAddManualHighlight = () => {
     if (newHighlight.trim() && content.includes(newHighlight.trim())) {
       setManualHighlights([...manualHighlights, newHighlight.trim()]);
@@ -185,79 +167,47 @@ export default function NotePage({ params }: { params: { id: string } }) {
                         Edit
                     </Button>
                 )}
-                 <Button onClick={handleAiHighlight} variant="outline" disabled={isHighlighting || isEditing}>
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    {isHighlighting ? 'Analyzing...' : 'AI Highlights'}
-                </Button>
                 <Button onClick={() => setIsHighlightDialogOpen(true)} variant="outline">
-                    Highlights
+                    Manage Highlights
                 </Button>
             </CardFooter>
         </Card>
          <Dialog open={isHighlightDialogOpen} onOpenChange={setIsHighlightDialogOpen}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Key Points</DialogTitle>
+                    <DialogTitle>Manual Highlights</DialogTitle>
                     <DialogDescription>
-                    Manage AI-generated and manual highlights for your note.
+                    Manage your custom highlights for this note.
                     </DialogDescription>
                 </DialogHeader>
-                <Tabs defaultValue="ai" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="ai" onClick={handleAiHighlight}>AI Generated</TabsTrigger>
-                        <TabsTrigger value="manual">Manual</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="ai" className="py-4 min-h-[200px]">
-                        {isHighlighting ? (
-                        <div className="flex items-center justify-center gap-2 h-full">
-                            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                            <p className="text-muted-foreground">Generating highlights...</p>
+                <div className="py-4 min-h-[200px]">
+                    <div className="flex flex-col gap-4">
+                        <div className="flex gap-2">
+                            <Input 
+                                value={newHighlight}
+                                onChange={(e) => setNewHighlight(e.target.value)}
+                                placeholder="Add a new highlight"
+                            />
+                            <Button onClick={handleAddManualHighlight} size="icon">
+                                <Plus className="h-4 w-4"/>
+                            </Button>
                         </div>
-                        ) : highlightError ? (
-                        <Alert variant="destructive">
-                            <AlertCircle className="h-4 w-4" />
-                            <AlertTitle>Highlighting Failed</AlertTitle>
-                            <AlertDescription>{highlightError}</AlertDescription>
-                        </Alert>
-                        ) : aiHighlights.length > 0 ? (
-                        <ul className="space-y-2 list-disc list-inside">
-                            {aiHighlights.map((point, index) => (
-                            <li key={index} className="font-headline">{point}</li>
-                            ))}
-                        </ul>
+                        {manualHighlights.length > 0 ? (
+                            <ul className="space-y-2">
+                                {manualHighlights.map((point, index) => (
+                                <li key={index} className="font-headline flex items-center justify-between p-2 rounded-md hover:bg-muted">
+                                    <span className="underline">{point}</span>
+                                    <Button variant="ghost" size="icon" onClick={() => handleRemoveManualHighlight(index)}>
+                                        <Trash2 className="h-4 w-4 text-destructive"/>
+                                    </Button>
+                                </li>
+                                ))}
+                            </ul>
                         ) : (
-                        <p className="text-center text-muted-foreground h-full flex items-center justify-center">No key points were found to highlight.</p>
+                            <p className="text-center text-muted-foreground pt-8">No manual highlights yet.</p>
                         )}
-                    </TabsContent>
-                    <TabsContent value="manual" className="py-4 min-h-[200px]">
-                        <div className="flex flex-col gap-4">
-                            <div className="flex gap-2">
-                                <Input 
-                                    value={newHighlight}
-                                    onChange={(e) => setNewHighlight(e.target.value)}
-                                    placeholder="Add a new highlight"
-                                />
-                                <Button onClick={handleAddManualHighlight} size="icon">
-                                    <Plus className="h-4 w-4"/>
-                                </Button>
-                            </div>
-                            {manualHighlights.length > 0 ? (
-                                <ul className="space-y-2">
-                                    {manualHighlights.map((point, index) => (
-                                    <li key={index} className="font-headline flex items-center justify-between p-2 rounded-md hover:bg-muted">
-                                        <span className="underline">{point}</span>
-                                        <Button variant="ghost" size="icon" onClick={() => handleRemoveManualHighlight(index)}>
-                                            <Trash2 className="h-4 w-4 text-destructive"/>
-                                        </Button>
-                                    </li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p className="text-center text-muted-foreground pt-8">No manual highlights yet.</p>
-                            )}
-                        </div>
-                    </TabsContent>
-                </Tabs>
+                    </div>
+                </div>
             </DialogContent>
       </Dialog>
     </div>

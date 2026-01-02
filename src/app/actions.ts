@@ -2,7 +2,6 @@
 'use server';
 
 import { convertHandwrittenNotesToText } from '@/ai/flows/convert-handwritten-notes-to-text';
-import { highlightPoints } from '@/ai/flows/highlight-points-flow';
 
 export async function generateTextFromNote(imageUrl: string) {
   try {
@@ -29,23 +28,4 @@ export async function generateTextFromNote(imageUrl: string) {
       }
     };
   }
-}
-
-export async function generateHighlights(text: string) {
-    if (!text) {
-        return { success: false, error: 'No text provided.' };
-    }
-    try {
-        const result = await highlightPoints({ text });
-        // The AI can successfully return an empty array of points.
-        // We need to check for the existence of the points property, even if it's empty.
-        if (result && Array.isArray(result.points)) {
-            return { success: true, data: { points: result.points } };
-        }
-        // This case handles malformed responses from the AI.
-        return { success: false, error: 'The AI returned an invalid response.' };
-    } catch (error) {
-        console.error('Error generating highlights:', error);
-        return { success: false, error: 'An unexpected error occurred while generating highlights.' };
-    }
 }
