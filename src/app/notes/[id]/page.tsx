@@ -23,9 +23,6 @@ import { Input } from '@/components/ui/input';
 
 // A mock in-memory store for full note content.
 const noteContentStore: { [key: string]: string } = {};
-notes.forEach(note => {
-    noteContentStore[note.id] = `${note.excerpt}\n\nThis is a placeholder for the full note content. You can expand on the excerpt here with more details, examples, and explanations related to "${note.title}".`;
-});
 
 
 export default function NotePage({ params }: { params: { id: string } }) {
@@ -48,6 +45,9 @@ export default function NotePage({ params }: { params: { id: string } }) {
     const noteToLoad = notes.find(n => n.id === id);
 
     if (noteToLoad) {
+       if (!noteContentStore[id]) {
+        noteContentStore[id] = `${noteToLoad.excerpt}\n\nThis is a placeholder for the full note content. You can expand on the excerpt here with more details, examples, and explanations related to "${noteToLoad.title}".`;
+      }
       setNote(noteToLoad);
       setContent(noteContentStore[id]);
       setManualHighlights(noteToLoad.manualHighlights || []);
@@ -152,7 +152,7 @@ export default function NotePage({ params }: { params: { id: string } }) {
                     {isHighlighting ? 'Analyzing...' : 'AI Highlights'}
                 </Button>
                 <Button onClick={() => setIsHighlightDialogOpen(true)} variant="outline">
-                    Manual Highlights
+                    Highlights
                 </Button>
             </CardFooter>
         </Card>

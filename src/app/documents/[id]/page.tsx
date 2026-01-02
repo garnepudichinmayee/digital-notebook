@@ -24,9 +24,6 @@ import { Input } from '@/components/ui/input';
 
 // A mock in-memory store for full document content.
 const documentContentStore: { [key: string]: string } = {};
-documents.forEach(doc => {
-    documentContentStore[doc.id] = `${doc.excerpt}\n\nThis is a placeholder for the full document content. You can expand on the excerpt here with the complete text of "${doc.title}".`;
-});
 
 
 export default function DocumentPage({ params }: { params: { id: string } }) {
@@ -49,6 +46,9 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
     const docToLoad = documents.find(d => d.id === id);
 
     if (docToLoad) {
+      if (!documentContentStore[id]) {
+        documentContentStore[id] = `${docToLoad.excerpt}\n\nThis is a placeholder for the full document content. You can expand on the excerpt here with the complete text of "${docToLoad.title}".`;
+      }
       setDoc(docToLoad);
       setContent(documentContentStore[id]);
       setManualHighlights(docToLoad.manualHighlights || []);
@@ -154,7 +154,7 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
                 {isHighlighting ? 'Analyzing...' : 'AI Highlights'}
             </Button>
             <Button onClick={() => setIsHighlightDialogOpen(true)} variant="outline">
-                Manual Highlights
+                Highlights
             </Button>
         </CardFooter>
       </Card>
