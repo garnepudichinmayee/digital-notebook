@@ -24,6 +24,7 @@ export type Note = {
   subject: string;
   lastModified: string;
   excerpt: string;
+  manualHighlights: string[];
 };
 
 export type Document = {
@@ -33,6 +34,7 @@ export type Document = {
   subject: string;
   lastModified: string;
   excerpt: string;
+  manualHighlights: string[];
 };
 
 export const folders: Folder[] = [
@@ -54,6 +56,7 @@ export const notes: Note[] = [
     subject: 'Molecular Biology',
     lastModified: '2024-07-20',
     excerpt: 'Key enzymes: Helicase, Polymerase, Ligase...',
+    manualHighlights: ['DNA replication is semi-conservative.'],
   },
   {
     id: 'n2',
@@ -62,6 +65,7 @@ export const notes: Note[] = [
     subject: 'Organic Chemistry',
     lastModified: '2024-07-19',
     excerpt: 'Comparison of reaction mechanisms, stereochemistry...',
+    manualHighlights: [],
   },
   {
     id: 'n3',
@@ -70,6 +74,7 @@ export const notes: Note[] = [
     subject: 'European History',
     lastModified: '2024-07-21',
     excerpt: 'Causes, major events, and the rise of Napoleon...',
+    manualHighlights: ['The storming of the Bastille was a pivotal moment.'],
   },
     {
     id: 'n4',
@@ -78,6 +83,7 @@ export const notes: Note[] = [
     subject: 'Calculus II',
     lastModified: '2024-07-18',
     excerpt: 'Formula: ∫u dv = uv - ∫v du. Examples and practice problems...',
+    manualHighlights: [],
   },
 ];
 
@@ -89,6 +95,7 @@ export const documents: Document[] = [
     subject: 'Molecular Biology',
     lastModified: '2024-07-15',
     excerpt: 'A review of gene-editing technologies and their applications.',
+    manualHighlights: [],
   },
   {
     id: 'd2',
@@ -97,6 +104,7 @@ export const documents: Document[] = [
     subject: 'Organic Chemistry',
     lastModified: '2024-01-10',
     excerpt: 'Course outline, grading policy, and schedule.',
+    manualHighlights: ['Midterm is on March 15th.'],
   },
     {
     id: 'd3',
@@ -105,6 +113,7 @@ export const documents: Document[] = [
     subject: 'European History',
     lastModified: '2024-07-12',
     excerpt: 'Full text for analysis and class discussion.',
+    manualHighlights: [],
   },
 ];
 

@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { folders, notes } from '@/lib/data';
 import Link from 'next/link';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Plus, Trash2 } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 
 export default function NewNotePage() {
   const router = useRouter();
@@ -18,7 +19,21 @@ export default function NewNotePage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [subject, setSubject] = useState('');
+  const [manualHighlights, setManualHighlights] = useState<string[]>([]);
+  const [newHighlight, setNewHighlight] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+
+  const handleAddManualHighlight = () => {
+    if (newHighlight.trim()) {
+      setManualHighlights([...manualHighlights, newHighlight.trim()]);
+      setNewHighlight('');
+    }
+  };
+
+  const handleRemoveManualHighlight = (index: number) => {
+    setManualHighlights(manualHighlights.filter((_, i) => i !== index));
+  };
+
 
   const handleSave = () => {
     if (!title || !content || !subject) {
@@ -32,7 +47,6 @@ export default function NewNotePage() {
 
     setIsSaving(true);
 
-    // In a real app, you'd save to a database. Here, we'll just add to our mock data.
     const newNote = {
       id: `n${notes.length + 1}`,
       title,
@@ -40,10 +54,9 @@ export default function NewNotePage() {
       subject,
       lastModified: new Date().toISOString().split('T')[0],
       excerpt: content.substring(0, 100) + (content.length > 100 ? '...' : ''),
+      manualHighlights: manualHighlights,
     };
     
-    // This is a mock implementation. The data won't persist across page reloads.
-    // In a real app, this would be an API call.
     console.log('New note created:', newNote);
     notes.push(newNote);
 
@@ -100,8 +113,34 @@ export default function NewNotePage() {
             placeholder="Start writing your note here..."
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="h-[400px] resize-none font-headline text-lg leading-relaxed"
+            className="h-[300px] resize-none font-headline text-lg leading-relaxed"
           />
+           <div className="space-y-2">
+            <Label>Manual Highlights</Label>
+            <div className="flex gap-2">
+                <Input 
+                    value={newHighlight}
+                    onChange={(e) => setNewHighlight(e.target.value)}
+                    placeholder="Add a new highlight"
+                />
+                <Button onClick={handleAddManualHighlight} size="icon" type="button">
+                    <Plus className="h-4 w-4"/>
+                </Button>
+            </div>
+             {manualHighlights.length > 0 && (
+                <ul className="space-y-2 list-disc list-inside rounded-md border p-4">
+                    {manualHighlights.map((point, index) => (
+                    <li key={index} className="font-headline flex items-center justify-between">
+                        <span>{point}</span>
+                        <Button variant="ghost" size="icon" type="button" onClick={() => handleRemoveManualHighlight(index)}>
+                            <Trash2 className="h-4 w-4 text-destructive"/>
+                        </Button>
+                    </li>
+                    ))}
+                </ul>
+            )}
+           </div>
+
         </CardContent>
         <CardFooter>
           <Button onClick={handleSave} disabled={isSaving}>

@@ -16,8 +16,10 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import { Sparkles, Loader2, AlertCircle, Plus, Trash2 } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
 
 // A mock in-memory store for full note content.
 const noteContentStore: { [key: string]: string } = {};
@@ -32,10 +34,14 @@ export default function NotePage({ params }: { params: { id: string } }) {
   const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
   const [isHighlighting, startHighlightTransition] = useTransition();
-  const [highlights, setHighlights] = useState<string[]>([]);
+  const [aiHighlights, setAiHighlights] = useState<string[]>([]);
+  const [manualHighlights, setManualHighlights] = useState<string[]>([]);
+  const [newHighlight, setNewHighlight] = useState('');
   const [highlightError, setHighlightError] = useState<string | null>(null);
   const [isHighlightDialogOpen, setIsHighlightDialogOpen] = useState(false);
+  
   const { toast } = useToast();
 
   useEffect(() => {
@@ -43,8 +49,8 @@ export default function NotePage({ params }: { params: { id: string } }) {
 
     if (noteToLoad) {
       setNote(noteToLoad);
-      // Load full content from our store
-      setContent(noteContentStore[id]); 
+      setContent(noteContentStore[id]);
+      setManualHighlights(noteToLoad.manualHighlights || []);
     } else {
         notFound();
     }
@@ -55,19 +61,17 @@ export default function NotePage({ params }: { params: { id: string } }) {
     if (!note) return;
     setIsSaving(true);
     
-    // Update our mock content store
     noteContentStore[note.id] = content;
     
-    // Also update the excerpt in the main data array for display on other pages
     const noteIndex = notes.findIndex(n => n.id === note.id);
     if (noteIndex !== -1) {
         notes[noteIndex].excerpt = content.substring(0, 100) + (content.length > 100 ? '...' : '');
         notes[noteIndex].lastModified = new Date().toISOString().split('T')[0];
+        notes[noteIndex].manualHighlights = manualHighlights;
     }
 
     setTimeout(() => {
         setIsSaving(false);
-        // We don't need to call setNote here as the note properties aren't changing, only content
         toast({
             title: "Note Saved!",
             description: "Your changes have been saved successfully.",
@@ -75,18 +79,29 @@ export default function NotePage({ params }: { params: { id: string } }) {
     }, 1000);
   };
   
-  const handleHighlight = () => {
-    setHighlights([]);
+  const handleAiHighlight = () => {
+    setAiHighlights([]);
     setHighlightError(null);
     setIsHighlightDialogOpen(true);
     startHighlightTransition(async () => {
       const result = await generateHighlights(content);
       if (result.success && result.data) {
-        setHighlights(result.data.points);
+        setAiHighlights(result.data.points);
       } else {
         setHighlightError(result.error || 'An unexpected error occurred.');
       }
     });
+  };
+
+  const handleAddManualHighlight = () => {
+    if (newHighlight.trim()) {
+      setManualHighlights([...manualHighlights, newHighlight.trim()]);
+      setNewHighlight('');
+    }
+  };
+
+  const handleRemoveManualHighlight = (index: number) => {
+    setManualHighlights(manualHighlights.filter((_, i) => i !== index));
   };
   
   if (isLoading) {
@@ -132,43 +147,80 @@ export default function NotePage({ params }: { params: { id: string } }) {
                 <Button onClick={handleSave} disabled={isSaving}>
                     {isSaving ? 'Saving...' : 'Save Changes'}
                 </Button>
-                 <Button onClick={handleHighlight} variant="outline" disabled={isHighlighting}>
+                 <Button onClick={handleAiHighlight} variant="outline" disabled={isHighlighting}>
                     <Sparkles className="mr-2 h-4 w-4" />
-                    {isHighlighting ? 'Analyzing...' : 'Highlight Points'}
+                    {isHighlighting ? 'Analyzing...' : 'AI Highlights'}
+                </Button>
+                <Button onClick={() => setIsHighlightDialogOpen(true)} variant="outline">
+                    Manual Highlights
                 </Button>
             </CardFooter>
         </Card>
          <Dialog open={isHighlightDialogOpen} onOpenChange={setIsHighlightDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Key Points</DialogTitle>
-            <DialogDescription>
-              Here are the key points our AI found in your note.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            {isHighlighting ? (
-              <div className="flex items-center justify-center gap-2">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                <p className="text-muted-foreground">Generating highlights...</p>
-              </div>
-            ) : highlightError ? (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Highlighting Failed</AlertTitle>
-                <AlertDescription>{highlightError}</AlertDescription>
-              </Alert>
-            ) : highlights.length > 0 ? (
-              <ul className="space-y-2 list-disc list-inside">
-                {highlights.map((point, index) => (
-                  <li key={index} className="font-headline">{point}</li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-center text-muted-foreground">No key points were found to highlight.</p>
-            )}
-          </div>
-        </DialogContent>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Key Points</DialogTitle>
+                    <DialogDescription>
+                    Manage AI-generated and manual highlights for your note.
+                    </DialogDescription>
+                </DialogHeader>
+                <Tabs defaultValue="ai" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="ai" onClick={handleAiHighlight}>AI Generated</TabsTrigger>
+                        <TabsTrigger value="manual">Manual</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="ai" className="py-4 min-h-[200px]">
+                        {isHighlighting ? (
+                        <div className="flex items-center justify-center gap-2 h-full">
+                            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                            <p className="text-muted-foreground">Generating highlights...</p>
+                        </div>
+                        ) : highlightError ? (
+                        <Alert variant="destructive">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertTitle>Highlighting Failed</AlertTitle>
+                            <AlertDescription>{highlightError}</AlertDescription>
+                        </Alert>
+                        ) : aiHighlights.length > 0 ? (
+                        <ul className="space-y-2 list-disc list-inside">
+                            {aiHighlights.map((point, index) => (
+                            <li key={index} className="font-headline">{point}</li>
+                            ))}
+                        </ul>
+                        ) : (
+                        <p className="text-center text-muted-foreground h-full flex items-center justify-center">No key points were found to highlight.</p>
+                        )}
+                    </TabsContent>
+                    <TabsContent value="manual" className="py-4 min-h-[200px]">
+                        <div className="flex flex-col gap-4">
+                            <div className="flex gap-2">
+                                <Input 
+                                    value={newHighlight}
+                                    onChange={(e) => setNewHighlight(e.target.value)}
+                                    placeholder="Add a new highlight"
+                                />
+                                <Button onClick={handleAddManualHighlight} size="icon">
+                                    <Plus className="h-4 w-4"/>
+                                </Button>
+                            </div>
+                            {manualHighlights.length > 0 ? (
+                                <ul className="space-y-2 list-disc list-inside">
+                                    {manualHighlights.map((point, index) => (
+                                    <li key={index} className="font-headline flex items-center justify-between">
+                                        <span>{point}</span>
+                                        <Button variant="ghost" size="icon" onClick={() => handleRemoveManualHighlight(index)}>
+                                            <Trash2 className="h-4 w-4 text-destructive"/>
+                                        </Button>
+                                    </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-center text-muted-foreground pt-8">No manual highlights yet.</p>
+                            )}
+                        </div>
+                    </TabsContent>
+                </Tabs>
+            </DialogContent>
       </Dialog>
     </div>
   );
