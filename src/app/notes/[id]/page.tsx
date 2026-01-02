@@ -84,7 +84,7 @@ export default function NotePage({ params }: { params: { id: string } }) {
       if (result.success && result.data) {
         setHighlights(result.data.points);
       } else {
-        setHighlightError(result.error || 'An unknown error occurred.');
+        setHighlightError(result.error || 'An unexpected error occurred.');
       }
     });
   };
@@ -157,7 +157,7 @@ export default function NotePage({ params }: { params: { id: string } }) {
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Highlighting Failed</AlertTitle>
                 <AlertDescription>{highlightError}</AlertDescription>
-              </Aler>
+              </Alert>
             ) : highlights.length > 0 ? (
               <ul className="space-y-2 list-disc list-inside">
                 {highlights.map((point, index) => (
