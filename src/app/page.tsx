@@ -6,6 +6,7 @@ import {
   Plus,
   Search,
 } from 'lucide-react';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -45,7 +46,7 @@ import { DashboardView } from '@/components/dashboard-view';
 import { AllFilesView } from '@/components/all-files-view';
 import { NoteConverterView } from '@/components/note-converter-view';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { folders, notes, documents } from '@/lib/data.tsx';
+import { folders, notes, documents } from '@/lib/data';
 
 
 export default function ScholarSlateDashboard() {
@@ -110,9 +111,11 @@ export default function ScholarSlateDashboard() {
                   <TabsTrigger value="converter">Note Converter</TabsTrigger>
                 </TabsList>
                 <div className="ml-auto flex items-center gap-2">
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    New Note
+                  <Button asChild>
+                    <Link href="/notes/n1">
+                      <Plus className="h-4 w-4 mr-2" />
+                      New Note
+                    </Link>
                   </Button>
                 </div>
               </div>
