@@ -54,16 +54,11 @@ export default function NotePage({ params }: { params: { id: string } }) {
     if (noteToLoad) {
       setNote(noteToLoad);
       setContent(noteToLoad.excerpt); 
+    } else {
+        notFound();
     }
     setIsLoading(false);
   }, [params.id]);
-
-  useEffect(() => {
-    if(!isLoading && !note) {
-        notFound();
-    }
-  }, [note, isLoading]);
-
 
   const handleSave = () => {
     if (!note) return;

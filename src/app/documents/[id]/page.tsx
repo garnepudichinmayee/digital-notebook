@@ -55,15 +55,11 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
     if (docToLoad) {
       setDoc(docToLoad);
       setContent(docToLoad.excerpt); 
+    } else {
+        notFound();
     }
     setIsLoading(false);
   }, [params.id]);
-
-  useEffect(() => {
-    if(!isLoading && !doc) {
-      notFound();
-    }
-  }, [doc, isLoading]);
 
   const handleSave = () => {
     if (!doc) return;
