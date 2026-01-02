@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useTransition, use } from 'react';
+import { useState, useEffect, useTransition, use, useMemo } from 'react';
 import { documents, documentContentStore, type Document } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
@@ -17,10 +17,25 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Sparkles, Loader2, AlertCircle, Plus, Trash2 } from 'lucide-react';
+import { Sparkles, Loader2, AlertCircle, Plus, Trash2, Edit, Save } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
+
+const renderWithHighlights = (text: string, highlights: string[]) => {
+    if (!highlights.length) {
+        return <p>{text}</p>;
+    }
+    const regex = new RegExp(`(${highlights.join('|')})`, 'g');
+    const parts = text.split(regex);
+    return (
+        <p>
+            {parts.map((part, index) =>
+                highlights.includes(part) ? <u key={index}>{part}</u> : part
+            )}
+        </p>
+    );
+};
 
 export default function DocumentPage({ params }: { params: { id: string } }) {
   const id = use(params).id;
@@ -28,6 +43,7 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
   const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   
   const [isHighlighting, startHighlightTransition] = useTransition();
   const [aiHighlights, setAiHighlights] = useState<string[]>([]);
@@ -43,11 +59,9 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
 
     if (docToLoad) {
       setDoc(docToLoad);
-      // Ensure the store has initial content if it hasn't been created yet
       if (!documentContentStore[docToLoad.id]) {
         documentContentStore[docToLoad.id] = `${docToLoad.excerpt}\n\nThis is a placeholder for the full document content. You can expand on the excerpt here with the complete text of "${docToLoad.title}".`;
       }
-      // Always load the latest content from the store
       setContent(documentContentStore[docToLoad.id]);
       setManualHighlights(docToLoad.manualHighlights || []);
     } else {
@@ -68,6 +82,8 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
         documents[docIndex].lastModified = new Date().toISOString().split('T')[0];
         documents[docIndex].manualHighlights = manualHighlights;
     }
+    
+    setIsEditing(false);
 
     setTimeout(() => {
         setIsSaving(false);
@@ -75,7 +91,7 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
             title: "Document Saved!",
             description: "Your changes have been saved successfully.",
         });
-    }, 1000);
+    }, 500);
   };
   
   const handleAiHighlight = () => {
@@ -93,15 +109,23 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
   };
 
   const handleAddManualHighlight = () => {
-    if (newHighlight.trim()) {
+    if (newHighlight.trim() && content.includes(newHighlight.trim())) {
       setManualHighlights([...manualHighlights, newHighlight.trim()]);
       setNewHighlight('');
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Highlight Not Found',
+        description: 'The highlighted text must exist exactly as written in the document content.',
+      })
     }
   };
 
   const handleRemoveManualHighlight = (index: number) => {
     setManualHighlights(manualHighlights.filter((_, i) => i !== index));
   };
+  
+  const renderedContent = useMemo(() => renderWithHighlights(content, manualHighlights), [content, manualHighlights]);
 
 
   if (isLoading) {
@@ -136,18 +160,32 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
           <CardDescription className="text-lg">Subject: {doc.subject} | Last Modified: {doc.lastModified}</CardDescription>
         </CardHeader>
         <CardContent>
-            <Textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                className="h-[400px] resize-none font-headline text-lg leading-relaxed"
-                aria-label="Document content"
-            />
+            {isEditing ? (
+                <Textarea
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    className="h-[400px] resize-none font-headline text-lg leading-relaxed"
+                    aria-label="Document content"
+                />
+            ) : (
+                <div className="h-[400px] overflow-auto rounded-md border p-3 font-headline text-lg leading-relaxed whitespace-pre-wrap">
+                    {renderedContent}
+                </div>
+            )}
         </CardContent>
         <CardFooter className="gap-2">
-            <Button onClick={handleSave} disabled={isSaving}>
-                {isSaving ? 'Saving...' : 'Save Changes'}
-            </Button>
-             <Button onClick={handleAiHighlight} variant="outline" disabled={isHighlighting}>
+             {isEditing ? (
+                <Button onClick={handleSave} disabled={isSaving}>
+                    <Save className="mr-2 h-4 w-4" />
+                    {isSaving ? 'Saving...' : 'Save Changes'}
+                </Button>
+            ) : (
+                 <Button onClick={() => setIsEditing(true)}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit
+                </Button>
+            )}
+             <Button onClick={handleAiHighlight} variant="outline" disabled={isHighlighting || isEditing}>
                 <Sparkles className="mr-2 h-4 w-4" />
                 {isHighlighting ? 'Analyzing...' : 'AI Highlights'}
             </Button>
@@ -206,7 +244,7 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
                     {manualHighlights.length > 0 ? (
                         <ul className="space-y-2">
                             {manualHighlights.map((point, index) => (
-                            <li key={index} className="font-headline flex items-center justify-between p-3">
+                            <li key={index} className="font-headline flex items-center justify-between p-2 rounded-md hover:bg-muted">
                                 <span className="underline">{point}</span>
                                 <Button variant="ghost" size="icon" onClick={() => handleRemoveManualHighlight(index)}>
                                     <Trash2 className="h-4 w-4 text-destructive"/>
