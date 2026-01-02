@@ -28,6 +28,7 @@ notes.forEach(note => {
 
 
 export default function NotePage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const [note, setNote] = useState<Note | undefined>(undefined);
   const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -39,8 +40,7 @@ export default function NotePage({ params }: { params: { id: string } }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    const noteId = params.id;
-    const noteToLoad = noteStore[noteId];
+    const noteToLoad = noteStore[id];
 
     if (noteToLoad) {
       setNote(noteToLoad);
@@ -49,7 +49,7 @@ export default function NotePage({ params }: { params: { id: string } }) {
         notFound();
     }
     setIsLoading(false);
-  }, [params.id]);
+  }, [id]);
 
   const handleSave = () => {
     if (!note) return;

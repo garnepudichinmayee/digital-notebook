@@ -28,6 +28,7 @@ documents.forEach(doc => {
 
 
 export default function DocumentPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const [doc, setDoc] = useState<Document | undefined>(undefined);
   const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -39,17 +40,16 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    const docId = params.id;
-    const docToLoad = documentStore[docId];
+    const docToLoad = documentStore[id];
 
     if (docToLoad) {
       setDoc(docToLoad);
       setContent(docToLoad.excerpt);
     } else {
-      notFound();
+        notFound();
     }
     setIsLoading(false);
-  }, [params.id]);
+  }, [id]);
 
   const handleSave = () => {
     if (!doc) return;
