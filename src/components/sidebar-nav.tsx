@@ -1,14 +1,7 @@
 'use client';
 import {
   Bell,
-  Book,
   Home,
-  Package2,
-  Settings,
-  Users,
-  Folder as FolderIcon,
-  File,
-  HardDrive
 } from 'lucide-react';
 import Link from 'next/link';
 import type { Folder } from '@/lib/data.tsx';
@@ -26,12 +19,15 @@ import {
     SidebarGroupLabel,
     SidebarGroupContent,
 } from '@/components/ui/sidebar';
+import { usePathname } from 'next/navigation';
 
 type SidebarNavProps = {
   folders: Folder[];
 };
 
 export function SidebarNav({ folders }: SidebarNavProps) {
+  const pathname = usePathname();
+
   return (
     <>
     <SidebarHeader>
@@ -44,7 +40,7 @@ export function SidebarNav({ folders }: SidebarNavProps) {
     <SidebarContent>
         <SidebarMenu>
             <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive>
+                <SidebarMenuButton asChild isActive={pathname === '/'}>
                     <Link href="/">
                         <Home />
                         <span>Dashboard</span>
@@ -65,9 +61,11 @@ export function SidebarNav({ folders }: SidebarNavProps) {
                 <SidebarMenu>
                     {folders.map((folder) => (
                         <SidebarMenuItem key={folder.id}>
-                            <SidebarMenuButton href="#">
-                                {folder.icon}
-                                <span>{folder.name}</span>
+                            <SidebarMenuButton asChild isActive={pathname === `/subjects/${folder.id}`}>
+                                <Link href={`/subjects/${folder.id}`}>
+                                    {folder.icon}
+                                    <span>{folder.name}</span>
+                                </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     ))}

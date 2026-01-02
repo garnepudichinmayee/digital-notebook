@@ -36,14 +36,14 @@ export type Document = {
 };
 
 export const folders: Folder[] = [
-  { id: '1', name: 'Molecular Biology', icon: <Atom className="h-4 w-4" /> },
-  { id: '2', name: 'Organic Chemistry', icon: <FlaskConical className="h-4 w-4" /> },
-  { id: '3', name: 'European History', icon: <Landmark className="h-4 w-4" /> },
-  { id: '4', name: 'Calculus II', icon: <Sigma className="h-4 w-4" /> },
-  { id: '5', name: 'Creative Writing', icon: <PenSquare className="h-4 w-4" /> },
-  { id: '6', name: 'Physics', icon: <Atom className="h-4 w-4" /> },
-  { id: '7', name: 'Law', icon: <Scale className="h-4 w-4" /> },
-  { id: '8', name: 'Languages', icon: <Languages className="h-4 w-4" /> },
+  { id: 'molecular-biology', name: 'Molecular Biology', icon: <Atom className="h-4 w-4" /> },
+  { id: 'organic-chemistry', name: 'Organic Chemistry', icon: <FlaskConical className="h-4 w-4" /> },
+  { id: 'european-history', name: 'European History', icon: <Landmark className="h-4 w-4" /> },
+  { id: 'calculus-ii', name: 'Calculus II', icon: <Sigma className="h-4 w-4" /> },
+  { id: 'creative-writing', name: 'Creative Writing', icon: <PenSquare className="h-4 w-4" /> },
+  { id: 'physics', name: 'Physics', icon: <Atom className="h-4 w-4" /> },
+  { id: 'law', name: 'Law', icon: <Scale className="h-4 w-4" /> },
+  { id: 'languages', name: 'Languages', icon: <Languages className="h-4 w-4" /> },
 ];
 
 export const notes: Note[] = [
