@@ -7,12 +7,15 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/com
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // A mock in-memory store. In a real app, you'd use a database.
 const documentStore: { [key: string]: Document } = {};
 documents.forEach(doc => {
     const fullContent = `${doc.excerpt}\n\nThis is a placeholder for the full document content. You can expand on the excerpt here with the complete text of "${doc.title}".`;
-    documentStore[doc.id] = { ...doc, excerpt: fullContent };
+    if (!documentStore[doc.id]) {
+      documentStore[doc.id] = { ...doc, excerpt: fullContent };
+    }
 });
 
 
@@ -20,29 +23,33 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
   const [doc, setDoc] = useState<Document | undefined>(undefined);
   const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
-    const docToLoad = documentStore[params.id];
-    if (docToLoad) {
-      setDoc(docToLoad);
-      setContent(docToLoad.excerpt); // now excerpt contains the full content
-    } else {
+    let docToLoad = documentStore[params.id];
+    
+    if (!docToLoad) {
         const initialDoc = documents.find((d) => d.id === params.id);
         if (initialDoc) {
-             const fullContent = `${initialDoc.excerpt}\n\nThis is a placeholder for the full document content. You can expand on the excerpt here with the complete text of "${initialDoc.title}".`;
-             documentStore[initialDoc.id] = { ...initialDoc, excerpt: fullContent };
-             setDoc(documentStore[initialDoc.id]);
-             setContent(fullContent);
+            const fullContent = `${initialDoc.excerpt}\n\nThis is a placeholder for the full document content. You can expand on the excerpt here with the complete text of "${initialDoc.title}".`;
+            documentStore[initialDoc.id] = { ...initialDoc, excerpt: fullContent };
+            docToLoad = documentStore[initialDoc.id];
         }
     }
+
+    if (docToLoad) {
+      setDoc(docToLoad);
+      setContent(docToLoad.excerpt); 
+    }
+    setIsLoading(false);
   }, [params.id]);
 
   useEffect(() => {
-    if(!doc) {
+    if(!isLoading && !doc) {
       notFound();
     }
-  }, [doc]);
+  }, [doc, isLoading]);
 
   const handleSave = () => {
     if (!doc) return;
@@ -61,6 +68,23 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
     }, 1000);
   };
   
+  if (isLoading) {
+    return (
+        <div className="flex justify-center items-start min-h-screen bg-muted/40 p-4 sm:p-6 lg:p-8">
+            <Card className="w-full max-w-3xl">
+                <CardHeader>
+                    <Skeleton className="h-8 w-3/4" />
+                    <Skeleton className="h-6 w-1/2" />
+                </CardHeader>
+                <CardContent className="flex flex-col gap-4">
+                    <Skeleton className="h-[400px] w-full" />
+                    <Skeleton className="h-10 w-32" />
+                </CardContent>
+            </Card>
+        </div>
+    );
+  }
+
   if (!doc) {
     return null; 
   }

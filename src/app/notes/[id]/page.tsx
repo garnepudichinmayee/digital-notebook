@@ -7,13 +7,15 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/com
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-
+import { Skeleton } from '@/components/ui/skeleton';
 
 // A mock in-memory store. In a real app, you'd use a database.
 const noteStore: { [key: string]: Note } = {};
 notes.forEach(note => {
     const fullContent = `${note.excerpt}\n\nThis is a placeholder for the full note content. You can expand on the excerpt here with more details, examples, and explanations related to "${note.title}".`;
-    noteStore[note.id] = { ...note, excerpt: fullContent };
+    if (!noteStore[note.id]) {
+      noteStore[note.id] = { ...note, excerpt: fullContent };
+    }
 });
 
 
@@ -21,29 +23,32 @@ export default function NotePage({ params }: { params: { id: string } }) {
   const [note, setNote] = useState<Note | undefined>(undefined);
   const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
-    const noteToLoad = noteStore[params.id];
-    if (noteToLoad) {
-      setNote(noteToLoad);
-      setContent(noteToLoad.excerpt); // excerpt now holds full content
-    } else {
+    let noteToLoad = noteStore[params.id];
+    if (!noteToLoad) {
         const initialNote = notes.find((n) => n.id === params.id);
         if(initialNote) {
             const fullContent = `${initialNote.excerpt}\n\nThis is a placeholder for the full note content. You can expand on the excerpt here with more details, examples, and explanations related to "${initialNote.title}".`;
             noteStore[initialNote.id] = {...initialNote, excerpt: fullContent};
-            setNote(noteStore[initialNote.id]);
-            setContent(fullContent);
+            noteToLoad = noteStore[initialNote.id];
         }
     }
+
+    if (noteToLoad) {
+      setNote(noteToLoad);
+      setContent(noteToLoad.excerpt); 
+    }
+    setIsLoading(false);
   }, [params.id]);
 
   useEffect(() => {
-    if(!note) {
+    if(!isLoading && !note) {
         notFound();
     }
-  }, [note]);
+  }, [note, isLoading]);
 
 
   const handleSave = () => {
@@ -63,6 +68,23 @@ export default function NotePage({ params }: { params: { id: string } }) {
     }, 1000);
   };
   
+  if (isLoading) {
+    return (
+        <div className="flex justify-center items-start min-h-screen bg-muted/40 p-4 sm:p-6 lg:p-8">
+            <Card className="w-full max-w-3xl">
+                <CardHeader>
+                    <Skeleton className="h-8 w-3/4" />
+                    <Skeleton className="h-6 w-1/2" />
+                </CardHeader>
+                <CardContent className="flex flex-col gap-4">
+                    <Skeleton className="h-[400px] w-full" />
+                    <Skeleton className="h-10 w-32" />
+                </CardContent>
+            </Card>
+        </div>
+    );
+  }
+
   if (!note) {
     return null;
   }
