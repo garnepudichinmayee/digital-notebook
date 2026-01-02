@@ -20,6 +20,9 @@ import { Input } from '@/components/ui/input';
 
 
 const renderWithHighlights = (text: string, highlights: string[]) => {
+    if (!text) {
+        return <p></p>;
+    }
     if (!highlights || !highlights.length) {
         return <p>{text}</p>;
     }
@@ -55,10 +58,15 @@ export default function NotePage({ params }: { params: { id: string } }) {
     const noteToLoad = notes.find(n => n.id === id);
 
     if (noteToLoad) {
-      setNote(noteToLoad);
-      const existingContent = noteContentStore[noteToLoad.id];
-      setContent(existingContent);
-      setManualHighlights(noteToLoad.manualHighlights || []);
+        setNote(noteToLoad);
+        if (noteContentStore[noteToLoad.id]) {
+            setContent(noteContentStore[noteToLoad.id]);
+        } else {
+            const placeholderContent = `${noteToLoad.title}\n\nThis is a placeholder for the full note content. You can expand on the excerpt here with more details, examples, and explanations related to "${noteToLoad.title}".`;
+            noteContentStore[noteToLoad.id] = placeholderContent;
+            setContent(placeholderContent);
+        }
+        setManualHighlights(noteToLoad.manualHighlights || []);
     } else {
         notFound();
     }

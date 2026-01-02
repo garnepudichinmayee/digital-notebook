@@ -19,6 +19,9 @@ import { Plus, Trash2, Edit, Save } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 const renderWithHighlights = (text: string, highlights: string[]) => {
+    if (!text) {
+        return <p></p>;
+    }
     if (!highlights || !highlights.length) {
         return <p>{text}</p>;
     }
@@ -53,10 +56,15 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
     const docToLoad = documents.find(d => d.id === id);
 
     if (docToLoad) {
-      setDoc(docToLoad);
-      const existingContent = documentContentStore[docToLoad.id];
-      setContent(existingContent);
-      setManualHighlights(docToLoad.manualHighlights || []);
+        setDoc(docToLoad);
+        if (documentContentStore[docToLoad.id]) {
+            setContent(documentContentStore[docToLoad.id]);
+        } else {
+             const placeholderContent = `${docToLoad.title}\n\nThis is a placeholder for the full document content. You can expand on the excerpt here with more details, examples, and explanations related to "${docToLoad.title}".`;
+             documentContentStore[docToLoad.id] = placeholderContent;
+             setContent(placeholderContent);
+        }
+        setManualHighlights(docToLoad.manualHighlights || []);
     } else {
         notFound();
     }
