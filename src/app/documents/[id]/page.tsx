@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useEffect, useTransition, use } from 'react';
 import { documents, type Document } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
@@ -28,7 +28,7 @@ documents.forEach(doc => {
 
 
 export default function DocumentPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+  const { id } = use(params);
   const [doc, setDoc] = useState<Document | undefined>(undefined);
   const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
