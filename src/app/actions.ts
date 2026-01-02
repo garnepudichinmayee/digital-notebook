@@ -2,6 +2,7 @@
 'use server';
 
 import { convertHandwrittenNotesToText } from '@/ai/flows/convert-handwritten-notes-to-text';
+import { highlightPoints } from '@/ai/flows/highlight-points-flow';
 
 export async function generateTextFromNote(imageUrl: string) {
   try {
@@ -28,4 +29,17 @@ export async function generateTextFromNote(imageUrl: string) {
       }
     };
   }
+}
+
+export async function generateHighlights(text: string) {
+    if (!text) {
+        return { success: false, error: 'No text provided.' };
+    }
+    try {
+        const result = await highlightPoints({ text });
+        return { success: true, data: result };
+    } catch (error) {
+        console.error('Error generating highlights:', error);
+        return { success: false, error: 'Failed to generate highlights.' };
+    }
 }
