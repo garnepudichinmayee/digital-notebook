@@ -23,9 +23,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 const noteStore: { [key: string]: Note } = {};
 notes.forEach(note => {
     const fullContent = `${note.excerpt}\n\nThis is a placeholder for the full note content. You can expand on the excerpt here with more details, examples, and explanations related to "${note.title}".`;
-    if (!noteStore[note.id]) {
-      noteStore[note.id] = { ...note, excerpt: fullContent };
-    }
+    noteStore[note.id] = { ...note, excerpt: fullContent };
 });
 
 
@@ -42,15 +40,7 @@ export default function NotePage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     const noteId = params.id;
-    let noteToLoad = noteStore[noteId];
-    if (!noteToLoad) {
-        const initialNote = notes.find((n) => n.id === noteId);
-        if(initialNote) {
-            const fullContent = `${initialNote.excerpt}\n\nThis is a placeholder for the full note content. You can expand on the excerpt here with more details, examples, and explanations related to "${initialNote.title}".`;
-            noteStore[initialNote.id] = {...initialNote, excerpt: fullContent};
-            noteToLoad = noteStore[initialNote.id];
-        }
-    }
+    const noteToLoad = noteStore[noteId];
 
     if (noteToLoad) {
       setNote(noteToLoad);

@@ -23,9 +23,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 const documentStore: { [key: string]: Document } = {};
 documents.forEach(doc => {
     const fullContent = `${doc.excerpt}\n\nThis is a placeholder for the full document content. You can expand on the excerpt here with the complete text of "${doc.title}".`;
-    if (!documentStore[doc.id]) {
-      documentStore[doc.id] = { ...doc, excerpt: fullContent };
-    }
+    documentStore[doc.id] = { ...doc, excerpt: fullContent };
 });
 
 
@@ -42,16 +40,7 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     const docId = params.id;
-    let docToLoad = documentStore[docId];
-
-    if (!docToLoad) {
-      const initialDoc = documents.find((d) => d.id === docId);
-      if (initialDoc) {
-        const fullContent = `${initialDoc.excerpt}\n\nThis is a placeholder for the full document content. You can expand on the excerpt here with the complete text of "${initialDoc.title}".`;
-        documentStore[initialDoc.id] = { ...initialDoc, excerpt: fullContent };
-        docToLoad = documentStore[initialDoc.id];
-      }
-    }
+    const docToLoad = documentStore[docId];
 
     if (docToLoad) {
       setDoc(docToLoad);
