@@ -37,8 +37,10 @@ export async function generateHighlights(text: string) {
     }
     try {
         const result = await highlightPoints({ text });
-        // The result from the flow is the direct output object.
-        return { success: true, data: result };
+        if (result && result.points) {
+            return { success: true, data: { points: result.points } };
+        }
+        return { success: false, error: 'Could not extract points from response.' };
     } catch (error) {
         console.error('Error generating highlights:', error);
         return { success: false, error: 'Failed to generate highlights.' };
