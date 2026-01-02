@@ -56,10 +56,14 @@ export default function NotePage({ params }: { params: { id: string } }) {
 
     if (noteToLoad) {
       setNote(noteToLoad);
-      if (!noteContentStore[noteToLoad.id]) {
-        noteContentStore[noteToLoad.id] = `${noteToLoad.excerpt}\n\nThis is a placeholder for the full note content. You can expand on the excerpt here with more details, examples, and explanations related to "${noteToLoad.title}".`;
+      const existingContent = noteContentStore[noteToLoad.id];
+      if (existingContent) {
+        setContent(existingContent);
+      } else {
+        const placeholderContent = `${noteToLoad.excerpt}\n\nThis is a placeholder for the full note content. You can expand on the excerpt here with more details, examples, and explanations related to "${noteToLoad.title}".`;
+        noteContentStore[noteToLoad.id] = placeholderContent;
+        setContent(placeholderContent);
       }
-      setContent(noteContentStore[noteToLoad.id]);
       setManualHighlights(noteToLoad.manualHighlights || []);
     } else {
         notFound();
