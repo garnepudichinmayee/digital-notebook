@@ -19,17 +19,17 @@ import { Plus, Trash2, Edit, Save } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 const renderWithHighlights = (text: string, highlights: string[]) => {
-    if (!highlights.length) {
+    if (!highlights || !highlights.length) {
         return <p>{text}</p>;
     }
     // Escape special characters for regex
     const escapedHighlights = highlights.map(h => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-    const regex = new RegExp(`(${escapedHighlights.join('|')})`, 'g');
+    const regex = new RegExp(`(${escapedHighlights.join('|')})`, 'gi');
     const parts = text.split(regex);
     return (
         <p>
             {parts.map((part, index) =>
-                highlights.includes(part) ? <u key={index}>{part}</u> : part
+                escapedHighlights.some(h => new RegExp(`^${h}$`, 'i').test(part)) ? <u key={index}>{part}</u> : part
             )}
         </p>
     );
