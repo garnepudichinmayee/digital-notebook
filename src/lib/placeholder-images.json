@@ -1,10 +1,3 @@
 {
-  "placeholderImages": [
-    {
-      "id": "handwritten-note",
-      "description": "A page of handwritten notes on lined paper.",
-      "imageUrl": "",
-      "imageHint": "handwritten notes"
-    }
-  ]
+  "placeholderImages": []
 }

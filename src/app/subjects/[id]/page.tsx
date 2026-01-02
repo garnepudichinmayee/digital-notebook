@@ -33,7 +33,7 @@ import {
 } from '@/components/ui/sidebar';
 import { SidebarNav } from '@/components/sidebar-nav';
 import { AllFilesView } from '@/components/all-files-view';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 
 export default function SubjectPage({ params }: { params: { id: string } }) {
@@ -82,7 +82,6 @@ export default function SubjectPage({ params }: { params: { id: string } }) {
                 <DropdownMenuTrigger asChild>
                   <Button variant="secondary" size="icon" className="rounded-full">
                     <Avatar>
-                      <AvatarImage src="" alt="User" />
                       <AvatarFallback>CS</AvatarFallback>
                     </Avatar>
                     <span className="sr-only">Toggle user menu</span>

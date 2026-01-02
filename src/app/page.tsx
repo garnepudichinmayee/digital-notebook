@@ -45,7 +45,7 @@ import { SidebarNav } from '@/components/sidebar-nav';
 import { DashboardView } from '@/components/dashboard-view';
 import { AllFilesView } from '@/components/all-files-view';
 import { NoteConverterView } from '@/components/note-converter-view';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { folders, notes, documents } from '@/lib/data';
 
 
@@ -85,7 +85,6 @@ export default function ScholarSlateDashboard() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="secondary" size="icon" className="rounded-full">
                     <Avatar>
-                      <AvatarImage src="" alt="User" />
                       <AvatarFallback>CS</AvatarFallback>
                     </Avatar>
                     <span className="sr-only">Toggle user menu</span>
