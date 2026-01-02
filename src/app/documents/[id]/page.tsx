@@ -55,13 +55,7 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
     if (docToLoad) {
       setDoc(docToLoad);
       const existingContent = documentContentStore[docToLoad.id];
-      if (existingContent) {
-          setContent(existingContent);
-      } else {
-          const placeholderContent = `${docToLoad.excerpt}\n\nThis is a placeholder for the full document content. You can expand on the excerpt here with the complete text of "${docToLoad.title}".`;
-          documentContentStore[docToLoad.id] = placeholderContent;
-          setContent(placeholderContent);
-      }
+      setContent(existingContent);
       setManualHighlights(docToLoad.manualHighlights || []);
     } else {
         notFound();
