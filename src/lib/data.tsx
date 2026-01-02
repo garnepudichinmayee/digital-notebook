@@ -1,11 +1,9 @@
 import React from 'react';
 import {
-  Folder as FolderIcon,
   FileText,
   BookOpen,
   FlaskConical,
   Atom,
-  Feather,
   Sigma,
   Scale,
   Languages,
