@@ -46,11 +46,13 @@ export default function DocumentPage({ params }: { params: { id: string } }) {
     const docToLoad = documents.find(d => d.id === id);
 
     if (docToLoad) {
-      if (!documentContentStore[id]) {
-        documentContentStore[id] = `${docToLoad.excerpt}\n\nThis is a placeholder for the full document content. You can expand on the excerpt here with the complete text of "${docToLoad.title}".`;
-      }
       setDoc(docToLoad);
-      setContent(documentContentStore[id]);
+      // Ensure the store has initial content if it hasn't been created yet
+      if (!documentContentStore[docToLoad.id]) {
+        documentContentStore[docToLoad.id] = `${docToLoad.excerpt}\n\nThis is a placeholder for the full document content. You can expand on the excerpt here with the complete text of "${docToLoad.title}".`;
+      }
+      // Always load the latest content from the store
+      setContent(documentContentStore[docToLoad.id]);
       setManualHighlights(docToLoad.manualHighlights || []);
     } else {
         notFound();

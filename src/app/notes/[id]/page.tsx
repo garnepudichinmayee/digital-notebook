@@ -45,11 +45,13 @@ export default function NotePage({ params }: { params: { id: string } }) {
     const noteToLoad = notes.find(n => n.id === id);
 
     if (noteToLoad) {
-       if (!noteContentStore[id]) {
-        noteContentStore[id] = `${noteToLoad.excerpt}\n\nThis is a placeholder for the full note content. You can expand on the excerpt here with more details, examples, and explanations related to "${noteToLoad.title}".`;
-      }
       setNote(noteToLoad);
-      setContent(noteContentStore[id]);
+      // Ensure the store has initial content if it hasn't been created yet
+      if (!noteContentStore[noteToLoad.id]) {
+        noteContentStore[noteToLoad.id] = `${noteToLoad.excerpt}\n\nThis is a placeholder for the full note content. You can expand on the excerpt here with more details, examples, and explanations related to "${noteToLoad.title}".`;
+      }
+      // Always load the latest content from the store
+      setContent(noteContentStore[noteToLoad.id]);
       setManualHighlights(noteToLoad.manualHighlights || []);
     } else {
         notFound();
