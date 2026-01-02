@@ -4,6 +4,13 @@
 import { convertHandwrittenNotesToText } from '@/ai/flows/convert-handwritten-notes-to-text';
 
 export async function generateTextFromNote(imageUrl: string) {
+  if (!imageUrl) {
+    return {
+      success: false,
+      error: "No image provided for conversion."
+    }
+  }
+
   try {
     const response = await fetch(imageUrl);
     if (!response.ok) {

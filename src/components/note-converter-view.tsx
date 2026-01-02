@@ -25,11 +25,16 @@ export function NoteConverterView() {
   const noteImage = PlaceHolderImages.find((img) => img.id === 'handwritten-note');
 
   const handleConversion = () => {
-    if (!noteImage) return;
+    if (!noteImage?.imageUrl) return;
     setError(null);
     setResult(null);
 
     startTransition(async () => {
+      // The AI action will fail offline, so we'll just show an error.
+      if (typeof window !== 'undefined' && !navigator.onLine) {
+        setError("This feature requires an internet connection.");
+        return;
+      }
       const response = await generateTextFromNote(noteImage.imageUrl);
       if (response.success && response.data) {
         setResult(response.data);
@@ -44,14 +49,14 @@ export function NoteConverterView() {
       <CardHeader>
         <CardTitle>Handwriting to Text Converter</CardTitle>
         <CardDescription>
-          Use our AI-powered tool to transform your handwritten notes into digital text.
+          Use our AI-powered tool to transform your handwritten notes into digital text. This feature requires an internet connection.
         </CardDescription>
       </CardHeader>
       <CardContent className="grid md:grid-cols-2 gap-6">
         <div className="flex flex-col gap-4">
           <h3 className="font-semibold">Your Handwritten Note</h3>
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-lg border">
-            {noteImage ? (
+            {noteImage?.imageUrl ? (
               <Image
                 src={noteImage.imageUrl}
                 alt={noteImage.description}
@@ -97,7 +102,7 @@ export function NoteConverterView() {
         </div>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleConversion} disabled={isPending || !noteImage}>
+        <Button onClick={handleConversion} disabled={isPending || !noteImage?.imageUrl}>
           {isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

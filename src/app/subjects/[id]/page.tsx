@@ -83,7 +83,7 @@ export default function SubjectPage({ params }: { params: { id: string } }) {
                 <DropdownMenuTrigger asChild>
                   <Button variant="secondary" size="icon" className="rounded-full">
                     <Avatar>
-                      <AvatarImage src="https://picsum.photos/seed/user/100/100" alt="User" />
+                      <AvatarImage src="" alt="User" />
                       <AvatarFallback>CS</AvatarFallback>
                     </Avatar>
                     <span className="sr-only">Toggle user menu</span>
