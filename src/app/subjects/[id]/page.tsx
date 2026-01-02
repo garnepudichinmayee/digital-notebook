@@ -102,10 +102,10 @@ export default function SubjectPage({ params }: { params: { id: string } }) {
           </header>
           <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
              <div className="flex items-center">
-                <h2 className="text-lg font-semibold">Files</h2>
+                <h2 className="text-lg font-semibold">Files in {folder.name}</h2>
                 <div className="ml-auto flex items-center gap-2">
                   <Button asChild>
-                    <Link href="/notes/n1">
+                    <Link href="/notes/new">
                       <Plus className="h-4 w-4 mr-2" />
                       New Note
                     </Link>

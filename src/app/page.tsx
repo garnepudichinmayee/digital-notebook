@@ -112,7 +112,7 @@ export default function ScholarSlateDashboard() {
                 </TabsList>
                 <div className="ml-auto flex items-center gap-2">
                   <Button asChild>
-                    <Link href="/notes/n1">
+                    <Link href="/notes/new">
                       <Plus className="h-4 w-4 mr-2" />
                       New Note
                     </Link>
