@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ArrowUpRight, BookOpen, FileText } from 'lucide-react';
-import type { Note, Document } from '@/lib/data.tsx';
+import type { Note, Document } from '@/lib/data';
 import {
   Card,
   CardContent,
@@ -32,7 +32,7 @@ export function DashboardView({ notes, documents }: DashboardViewProps) {
                   <p className="text-sm text-muted-foreground font-headline">{note.excerpt}</p>
                 </div>
                 <Button variant="outline" size="sm" asChild>
-                  <Link href="#">Open</Link>
+                  <Link href={`/notes/${note.id}`}>Open</Link>
                 </Button>
               </div>
             ))}
@@ -54,7 +54,7 @@ export function DashboardView({ notes, documents }: DashboardViewProps) {
                   <p className="text-sm text-muted-foreground font-headline">{doc.excerpt}</p>
                 </div>
                 <Button variant="outline" size="sm" asChild>
-                  <Link href="#">Read</Link>
+                  <Link href={`/documents/${doc.id}`}>Read</Link>
                 </Button>
               </div>
             ))}
