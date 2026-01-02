@@ -128,9 +128,9 @@ export default function NewNotePage() {
                 </Button>
             </div>
              {manualHighlights.length > 0 && (
-                <ul className="space-y-2 list-disc list-inside rounded-md border p-4">
+                <ul className="space-y-2 rounded-md border p-4">
                     {manualHighlights.map((point, index) => (
-                    <li key={index} className="font-headline flex items-center justify-between">
+                    <li key={index} className="font-headline flex items-center justify-between bg-secondary/50 border border-secondary rounded-lg p-3">
                         <span>{point}</span>
                         <Button variant="ghost" size="icon" type="button" onClick={() => handleRemoveManualHighlight(index)}>
                             <Trash2 className="h-4 w-4 text-destructive"/>
