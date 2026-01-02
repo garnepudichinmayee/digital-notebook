@@ -1,6 +1,5 @@
 'use client';
 
-import { use } from 'react';
 import { notFound } from 'next/navigation';
 import { folders, notes, documents, type Note, type Document } from '@/lib/data';
 import {
@@ -38,7 +37,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 
 export default function SubjectPage({ params }: { params: { id: string } }) {
-  const { id } = use(params);
+  const { id } = params;
   
   const folder = folders.find((f) => f.id === id);
 

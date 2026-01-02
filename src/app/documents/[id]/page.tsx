@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { documents, documentContentStore, type Document } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
@@ -39,7 +39,7 @@ const renderWithHighlights = (text: string, highlights: string[]) => {
 };
 
 export default function DocumentPage({ params }: { params: { id: string } }) {
-  const id = use(params).id;
+  const { id } = params;
   const [doc, setDoc] = useState<Document | undefined>(undefined);
   const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);

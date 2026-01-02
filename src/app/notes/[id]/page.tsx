@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { notes, noteContentStore, type Note } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
@@ -41,7 +41,7 @@ const renderWithHighlights = (text: string, highlights: string[]) => {
 
 
 export default function NotePage({ params }: { params: { id: string } }) {
-  const id = use(params).id;
+  const { id } = params;
   const [note, setNote] = useState<Note | undefined>(undefined);
   const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
