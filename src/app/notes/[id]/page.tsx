@@ -158,7 +158,7 @@ export default function NotePage({ params }: { params: { id: string } }) {
                 ))}
               </ul>
             ) : (
-              <p>No key points were found.</p>
+              <p className="text-center text-muted-foreground">No key points were found to highlight.</p>
             )}
           </div>
         </DialogContent>
