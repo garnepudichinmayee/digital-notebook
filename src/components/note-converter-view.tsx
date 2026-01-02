@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Wand2, Loader2 } from 'lucide-react';
+import { Wand2 } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -11,38 +10,15 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 
 export function NoteConverterView() {
-  const [isOnline, setIsOnline] = useState(true);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setIsOnline(navigator.onLine);
-      const handleOnline = () => setIsOnline(true);
-      const handleOffline = () => setIsOnline(false);
-      window.addEventListener('online', handleOnline);
-      window.addEventListener('offline', handleOffline);
-      return () => {
-        window.removeEventListener('online', handleOnline);
-        window.removeEventListener('offline', handleOffline);
-      };
-    }
-  }, []);
-
   return (
     <Card>
       <CardHeader>
         <CardTitle>Handwriting to Text Converter</CardTitle>
         <CardDescription>
           Use our AI-powered tool to transform your handwritten notes into
-          digital text.
-          {!isOnline && (
-            <span className="text-destructive font-semibold">
-              {' '}
-              This feature requires an internet connection.
-            </span>
-          )}
+          digital text. This feature is currently unavailable.
         </CardDescription>
       </CardHeader>
       <CardContent className="grid md:grid-cols-2 gap-6">
