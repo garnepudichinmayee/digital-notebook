@@ -37,10 +37,10 @@ export async function generateHighlights(text: string) {
     }
     try {
         const result = await highlightPoints({ text });
-        if (result && result.points && result.points.length > 0) {
+        if (result && result.points) {
             return { success: true, data: { points: result.points } };
         }
-        // Handle cases where the AI returns an empty array or an invalid response
+        // Handle cases where the AI returns an invalid response.
         return { success: false, error: 'The AI could not find any key points to highlight.' };
     } catch (error) {
         console.error('Error generating highlights:', error);
