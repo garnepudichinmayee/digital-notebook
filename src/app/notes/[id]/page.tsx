@@ -204,8 +204,8 @@ export default function NotePage({ params }: { params: { id: string } }) {
                             {manualHighlights.length > 0 ? (
                                 <ul className="space-y-2">
                                     {manualHighlights.map((point, index) => (
-                                    <li key={index} className="font-headline flex items-center justify-between bg-secondary/50 border border-secondary rounded-lg p-3">
-                                        <span>{point}</span>
+                                    <li key={index} className="font-headline flex items-center justify-between p-3">
+                                        <span className="underline">{point}</span>
                                         <Button variant="ghost" size="icon" onClick={() => handleRemoveManualHighlight(index)}>
                                             <Trash2 className="h-4 w-4 text-destructive"/>
                                         </Button>
