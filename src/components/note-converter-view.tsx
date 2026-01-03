@@ -141,7 +141,7 @@ export function NoteConverterView() {
         </div>
         <div className="flex flex-col gap-4">
           <h3 className="font-semibold">Converted Text</h3>
-          <div className="relative flex-grow">
+          <div className="relative flex-grow flex flex-col">
             {isConverting ? (
               <div className="flex flex-col items-center justify-center h-full gap-2 text-center rounded-lg border border-dashed">
                 <Wand2 className="h-8 w-8 text-muted-foreground animate-pulse" />
@@ -151,7 +151,7 @@ export function NoteConverterView() {
               <Textarea
                 readOnly
                 value={convertedText}
-                className="h-full resize-none font-headline"
+                className="h-full flex-grow resize-none font-headline"
               />
             ) : (
               <div className="flex flex-col items-center justify-center h-full gap-2 text-center rounded-lg border border-dashed">
