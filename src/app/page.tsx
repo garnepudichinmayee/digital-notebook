@@ -44,7 +44,6 @@ import {
 import { SidebarNav } from '@/components/sidebar-nav';
 import { DashboardView } from '@/components/dashboard-view';
 import { AllFilesView } from '@/components/all-files-view';
-import { NoteConverterView } from '@/components/note-converter-view';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { folders, notes, documents } from '@/lib/data';
 
@@ -107,7 +106,6 @@ export default function ScholarSlateDashboard() {
                 <TabsList>
                   <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                   <TabsTrigger value="files">All Files</TabsTrigger>
-                  <TabsTrigger value="converter">Note Converter</TabsTrigger>
                 </TabsList>
                 <div className="ml-auto flex items-center gap-2">
                   <Button asChild>
@@ -123,9 +121,6 @@ export default function ScholarSlateDashboard() {
               </TabsContent>
               <TabsContent value="files">
                 <AllFilesView items={[...notes, ...documents]} />
-              </TabsContent>
-              <TabsContent value="converter">
-                <NoteConverterView />
               </TabsContent>
             </Tabs>
           </main>
