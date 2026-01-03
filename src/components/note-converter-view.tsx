@@ -10,17 +10,29 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function NoteConverterView() {
   const { toast } = useToast();
   const [image, setImage] = useState<string | null>(null);
+  const [isImageLoading, setIsImageLoading] = useState(true);
   const [convertedText, setConvertedText] = useState('');
   const [isConverting, setIsConverting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const defaultImage = PlaceHolderImages.find(p => p.id === 'handwritten-note');
+    if (defaultImage) {
+      setImage(defaultImage.imageUrl);
+    } else {
+      setIsImageLoading(false);
+    }
+  }, []);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -33,6 +45,7 @@ export function NoteConverterView() {
         });
         return;
       }
+      setIsImageLoading(true);
       const reader = new FileReader();
       reader.onload = (e) => {
         setImage(e.target?.result as string);
@@ -95,17 +108,34 @@ export function NoteConverterView() {
             />
           </div>
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-lg border">
-            {image ? (
+            {isImageLoading && !image && (
+              <div className="flex items-center justify-center h-full bg-muted">
+                <p>Loading image...</p>
+              </div>
+            )}
+             {image ? (
               <Image
                 src={image}
                 alt="Handwritten note"
                 fill
                 className="object-cover"
+                onLoad={() => setIsImageLoading(false)}
+                onError={() => {
+                  setIsImageLoading(false);
+                  toast({
+                    variant: 'destructive',
+                    title: 'Image Error',
+                    description: 'Could not load the image.',
+                  });
+                }}
               />
             ) : (
-              <div className="flex items-center justify-center h-full bg-muted">
+               !isImageLoading && <div className="flex items-center justify-center h-full bg-muted">
                 <p>Upload an image to get started</p>
               </div>
+            )}
+             {isImageLoading && image && (
+                <Skeleton className="w-full h-full" />
             )}
           </div>
         </div>
@@ -135,7 +165,7 @@ export function NoteConverterView() {
         </div>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleConvert} disabled={!image || isConverting}>
+        <Button onClick={handleConvert} disabled={!image || isConverting || isImageLoading}>
           <Wand2 className="mr-2 h-4 w-4" />
           {isConverting ? 'Converting...' : 'Convert to Text'}
         </Button>
