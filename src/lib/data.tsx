@@ -117,15 +117,13 @@ export const documents: Document[] = [
   },
 ];
 
+const iconMap = {
+    Note: <FileText className="h-4 w-4 text-muted-foreground" />,
+    Document: <BookOpen className="h-4 w-4 text-muted-foreground" />,
+};
+
 export const getIconForType = (type: 'Note' | 'Document') => {
-    switch (type) {
-        case 'Note':
-            return <FileText className="h-4 w-4 text-muted-foreground" />;
-        case 'Document':
-            return <BookOpen className="h-4 w-4 text-muted-foreground" />;
-        default:
-            return null;
-    }
+    return iconMap[type] || null;
 }
 
 // A mock in-memory store for full document content.

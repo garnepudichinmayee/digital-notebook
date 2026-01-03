@@ -25,14 +25,16 @@ const renderWithHighlights = (text: string, highlights: string[]) => {
     if (!highlights || !highlights.length) {
         return <p>{text}</p>;
     }
-    // Escape special characters for regex
-    const escapedHighlights = highlights.map(h => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-    const regex = new RegExp(`(${escapedHighlights.join('|')})`, 'gi');
+    const regex = new RegExp(`(${highlights.join('|')})`, 'gi');
     const parts = text.split(regex);
     return (
         <p>
             {parts.map((part, index) =>
-                escapedHighlights.some(h => new RegExp(`^${h}$`, 'i').test(part)) ? <u key={index}>{part}</u> : part
+                highlights.some(h => h.toLowerCase() === part.toLowerCase()) ? (
+                    <u key={index}>{part}</u>
+                ) : (
+                    part
+                )
             )}
         </p>
     );

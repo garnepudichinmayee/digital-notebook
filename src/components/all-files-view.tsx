@@ -21,6 +21,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { getIconForType } from '@/lib/data.tsx';
 import { useRouter } from 'next/navigation';
+import { useMemo } from 'react';
 
 type AllFilesViewProps = {
   items: (Note | Document)[];
@@ -29,7 +30,7 @@ type AllFilesViewProps = {
 export function AllFilesView({ items }: AllFilesViewProps) {
   const router = useRouter();
     // Sort items by last modified date
-    const sortedItems = [...items].sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime());
+    const sortedItems = useMemo(() => [...items].sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime()), [items]);
 
   const handleRowClick = (item: Note | Document) => {
     const path = item.type === 'Note' ? '/notes/' : '/documents/';
