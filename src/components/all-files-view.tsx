@@ -19,7 +19,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { getIconForType } from '@/lib/data.tsx';
+import { getIconForType } from '@/lib/data';
+
 import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 
